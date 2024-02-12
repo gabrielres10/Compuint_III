@@ -43,6 +43,16 @@ class UserController {
 
     public async update(req: Request, res: Response){
         try{
+            const userExists: UserDocument | null = await userService.findById(req.params.id);
+            if(!userExists)
+                return res.status(404).json({message: "User not found"});
+
+            if(req.body.password)
+                req.body.password = await bcrypt.hash(req.body.password, 10);
+
+            const updateUser: UserDocument = await userService.update(userExists);
+
+            return res.status(201).json(updateUser);
 
         }catch (error) {
             return res.status(500).json(error);
